@@ -37,11 +37,13 @@ for (var j=0; j<boxElements.length; j++){
 	boxElements[j].addEventListener('click', function(){
 		this.innerHTML = '<p>' + playerObj[player] + '</p>';
 		clickedBoxes.push(this.id);
+		console.log(clickedBoxes);
 		var randomBox = 'box' + randomNum();
 		//computer clicks random box that is not clicked
 		//set delay
 		if(clickedBoxes.indexOf(randomBox) === -1){
-		document.getElementById(randomBox).innerHTML = '<p>' + playerObj[complayer] + '</p>';
+			document.getElementById(randomBox).innerHTML = '<p>' + playerObj[complayer] + '</p>';
+			clickedBoxes.push(randomBox);
 		} 
 	}, false);
 }
@@ -49,4 +51,5 @@ for (var j=0; j<boxElements.length; j++){
 
 
 //3 in a row to win
+// winning conditions [012, 345, 678, 036, 147, 258, 048, 246]
 //reset on win
