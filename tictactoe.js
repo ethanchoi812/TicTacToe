@@ -4,6 +4,9 @@ var player = {
 	complayerid: '',
 }
 
+var playerArr = [];
+var comArr = [];
+
 //used for checking later
 var boxObj = {
 	box0:'',
@@ -53,8 +56,6 @@ for (var j=0; j<boxElements.length; j++){
 	
 	} else {
 
-		//function playerOne(){
-
 	var boxclicked = this.id;
 
 	//box is marked X or O if box is not marked before
@@ -65,6 +66,7 @@ for (var j=0; j<boxElements.length; j++){
 
 		//for checking later
 		boxObj[boxclicked] = player.playerid;
+		playerArr.push(boxclicked);
 	}
 			//check if player won yet?
 			winning.forEach(function(a){
@@ -78,25 +80,32 @@ for (var j=0; j<boxElements.length; j++){
 					
 					setTimeout(function(){
 						location.reload();
-					}, 1100);
+					}, 700);
 				}
 			});
 
-		//another box to get complayerid
-		var randomNum = function() {
-			var num = Math.floor(Math.random()*9);
-			return boxObj['box' + num] !== '' ? randomNum() : num;
-		}
-
+		
+		//if empty - random box
+		//if 1 in a row, continue row 
+		//to get 3 in a row
+		//to block player if 2 in a row
+		//to choose one between 2 if player creates 2 2-in-a-row
 		//add delay
 		setTimeout(function(){
+
+			//another box to get complayerid
+			var randomNum = function() {
+				var num = Math.floor(Math.random()*9);
+				return boxObj['box' + num] !== '' ? randomNum() : num;
+			}
 
 			var randomBox = 'box' + randomNum();
 
 			document.getElementById(randomBox).innerHTML = '<p class="mark">' + player.complayerid + '</p>';
-			
+		
 			boxObj[randomBox] = player.complayerid;
 
+			//test if computer wins
 			winning.forEach(function(a){
 				if(boxObj[a[0]] === player.complayerid && boxObj[a[1]] === player.complayerid && boxObj[a[2]] === player.complayerid){
 					
@@ -104,16 +113,20 @@ for (var j=0; j<boxElements.length; j++){
 						alertme.innerHTML = '<p>Computer Wins!</p>';
 					}, 100);
 
+					setTimeout(function(){
+						location.reload();
+					}, 700);
+
 					}
 				});
 
-			},1200);
+			},800);
 
-			//block player if 2 winning boxes get filled
 			}
-		}
+		
 	}, false); 
 }
+
 
 
 			
