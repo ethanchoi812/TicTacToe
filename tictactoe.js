@@ -37,24 +37,36 @@ var alertme = document.getElementById('alert');
 //target buttons by class name
 var btnElements = document.getElementsByClassName('player-btn');
 
-//assign 'x' or 'o' to player on click and the other to com
+
 for (var i=0; i<btnElements.length; i++){
 	btnElements[i].addEventListener('click', function(){
 		
+		//assign 'x' or 'o' to player on click and the other to com
 		player.playerid = this.id;
 		player.playerid === 'x' ? player.complayerid = 'o' : player.complayerid = 'x';
 		
+		//change btn color
+		document.getElementById(this.id).style.backgroundColor = '#0097fc' ? '#00ffc3' : '#0097fc';
+
 		//clears alert msg
 		alertme.innerHTML = '';
 	
-	}, false);
+	}, true);
 }
 
 //target boxes by class name
 var boxElements = document.getElementsByClassName('box');
 
-//add click events to boxes
+function markBox(thebox, marker, arr){
+	//Box to get playerid on click 
+	document.getElementById(thebox).innerHTML = '<p class="mark">' + marker + '</p>'; 
 
+	//for checking later
+	boxObj[thebox] = marker;
+	arr.push(thebox);
+}
+
+//add click events to boxes
 for (var j=0; j<boxElements.length; j++){
 	boxElements[j].addEventListener('click', function (){
 	
@@ -71,11 +83,7 @@ for (var j=0; j<boxElements.length; j++){
 	if(boxObj[boxclicked] === '') {
 	
 		//Box to get playerid on click 
-		document.getElementById(this.id).innerHTML = '<p class="mark">' + player.playerid + '</p>'; 
-
-		//for checking later
-		boxObj[boxclicked] = player.playerid;
-		playerArr.push(boxclicked);
+		markBox(this.id, player.playerid, playerArr);
 	}
 			//check if player won yet?
 			winning.forEach(function(a){
@@ -92,142 +100,117 @@ for (var j=0; j<boxElements.length; j++){
 					}, 700);
 				}
 			});
-
-
-		//if empty - random box
-		//if 1 in a row, continue row 
-		//to get 3 in a row
-		//to block player if 2 in a row
+		
 		//to choose one between 2 if player creates 2 2-in-a-row
 		//add delay
 		setTimeout(function(){
 
-			var counter;
 			//randomly pick a box to get complayerid
 			var randomBoxNum = function() {
 				var boxNum = Math.floor(Math.random()*9);
 				return boxObj['box' + boxNum] !== '' ? randomBoxNum() : boxNum;
 			}
 
-			//finds the arr where player has 2 boxes marked
-
 			var randomBox = 'box' + randomBoxNum();
 
-		if(playerArr.length < 2){
-			document.getElementById(randomBox).innerHTML = '<p class="mark">' + player.complayerid + '</p>';
-			
-			boxObj[randomBox] = player.complayerid;
-			comArr.push(randomBox);
+			//finds the arr where player is winning, i.e., has 2 boxes marked
+			function findWinningArr(arrForCheck){
+	
+			var ans	= winning.find(function(arr){
+				var res = [];
+				for(var i=0; i<arr.length; i++){
+					if(boxObj[arr[i]] === arrForCheck){
+						res.push(arr[i]);
+						}
+					}
 
-			} else if(playerArr.length > 1){
+				for(var j=0; j<arr.length; j++){
+					if(res.length === 2 && boxObj[arr[j]] === '') {
+						return arr;
+						}
+					}
+				});
+				return ans;
+			}
 		
-			var x = winning.find(function(arr){
-					var res1 = [];
-					//var res2 = [];
-					for(var i=0; i<arr.length; i++){
-						if(boxObj[arr[i]] === player.playerid){
-							res1.push(arr[i]);
-							}
-						}
+		//if player made 1 move - com marks random box
+		if(playerArr.length < 2){
 
-						for(var j=0; j<arr.length; j++){
-						if(res1.length === 2 && boxObj[arr[j]] === '') {
-							return arr;
-						}
-					}
-				});
+			markBox(randomBox, player.complayerid, comArr);
 
-				var y = winning.find(function(arr){
-					var res1 = [];
-					//var res2 = [];
-					for(var i=0; i<arr.length; i++){
-						if(boxObj[arr[i]] === player.complayerid){
-							res1.push(arr[i]);
-							}
-						}
+		} else if(playerArr.length >= 2){
 
-						for(var j=0; j<arr.length; j++){
-						if(res1.length === 2 && boxObj[arr[j]] === '') {
-							return arr;
-						}
-					}
-				});
+			var arrX = findWinningArr(player.playerid); //human is winning (2 in a row)
+			var arrY = findWinningArr(player.complayerid); //com is winning (2 in a row)
 
-				if(!x && !y){
-						document.getElementById(randomBox).innerHTML = '<p class="mark">' + player.complayerid + '</p>';
-						boxObj[randomBox] = player.complayerid;
-									comArr.push(randomBox);
-						
-					} else if(x && !y){
-					
-					for(var k=0; k<x.length; k++){
-						if(boxObj[x[k]] === ''){
-
-						document.getElementById(x[k]).innerHTML = '<p class="mark">' + player.complayerid + '</p>';
-							
-									boxObj[x[k]] = player.complayerid;
-									comArr.push(x[k]);
-								}
-							}
-						} else if(!x && y){
-							for(var k=0; k<y.length; k++){
-								if(boxObj[y[k]] === ''){
-
-								document.getElementById(y[k]).innerHTML = '<p class="mark">' + player.complayerid + '</p>';
-							
-									boxObj[y[k]] = player.complayerid;
-									comArr.push(y[k]);
-									}
-								}
-							} else if(x && y){
-										for(var k=0; k<y.length; k++){
-											if(boxObj[y[k]] === ''){
-
-											document.getElementById(y[k]).innerHTML = '<p class="mark">' + player.complayerid + '</p>';
-										
-												boxObj[y[k]] = player.complayerid;
-												comArr.push(y[k]);
-
-									}
-								}
-							}
-						}
-				/*
-					for(var j=0; j<arr.length; j++){
-						if(res1.length === 2 && boxObj[arr[j]] === '') {
-							document.getElementById(arr[j]).innerHTML = '<p class="mark">' + player.complayerid + '</p>';
-					
-							boxObj[arr[j]] = player.complayerid;
-							comArr.push(arr[j]);
-
-							} else if(res2.length === 2 && boxObj[arr[j]] === '') {
-								document.getElementById(arr[j]).innerHTML = '<p class="mark">' + player.complayerid + '</p>';
+			if(!arrX && !arrY){
 				
-								boxObj[arr[j]] = player.complayerid;
-								comArr.push(arr[j]);
-								} 
+			/*	var y2	= winning.find(function(arr){
+
+							for(var i=0; i<arr.length; i++){
+								if(boxObj[arr[i]] === player.complayerid){
+									for(var j=0; j<arr.length; j++){
+										if(boxObj[arr[j]] === '') {
+										console.log(arr[j]);
+									}
+								}
 							}
+						}		
+					});*/
+								
+				markBox(randomBox, player.complayerid, comArr);
+					
+				//to block human if winning
+			} else if(arrX && !arrY){
+					
+				for(var k=0; k<arrX.length; k++){
+					if(boxObj[arrX[k]] === ''){
+
+					markBox(arrX[k], player.complayerid, comArr);
+					}
+				}
+
+				//if human player does not have 2 in a row and computer has 2 in a row
+				//computer to go for 3 in a row
+			} else if(!arrX && arrY){
 						
-					}*/
-			
+				for(var k=0; k<arrY.length; k++){
+					if(boxObj[arrY[k]] === ''){
+
+					markBox(arrY[k], player.complayerid, comArr);
+					}
+				}
+					//if human & computer player both have 2 in a row
+					//computer to go for 3 in a row
+			} else if(arrX && arrY){
+					
+				for(var k=0; k<arrY.length; k++){
+					if(boxObj[arrY[k]] === ''){
+
+					markBox(arrY[k], player.complayerid, comArr);
+					}
+				}
+			}
+		}
 
 			//test if computer wins
-			winning.forEach(function(a){
-				if(boxObj[a[0]] === player.complayerid && boxObj[a[1]] === player.complayerid && boxObj[a[2]] === player.complayerid){
+		winning.forEach(function(a){
+			if(boxObj[a[0]] === player.complayerid && boxObj[a[1]] === player.complayerid && boxObj[a[2]] === player.complayerid){
 					
-					setTimeout(function(){
-						alertme.innerHTML = '<p>Computer Wins!</p>';
+				setTimeout(function(){
+					alertme.innerHTML = '<p>Computer Wins!</p>';
 					}, 100);
 
-					setTimeout(function(){
-						location.reload();
-					}, 900);
-
-					}
-				});
+				setTimeout(function(){
+					location.reload();
+					}, 700);
+				}
+			});
 			
-			},700);
+		},800);
 
+
+		//alert draw and reset
 		var total = eval(playerArr.length + comArr.length);
 		
 		if(total > 8){
@@ -236,12 +219,10 @@ for (var j=0; j<boxElements.length; j++){
 	
 			setTimeout(function(){
 				location.reload();
-					}, 900);
+					}, 700);
 				}
-			}
-		
+			}	
 	}, false); 
-	
 }
 
 
